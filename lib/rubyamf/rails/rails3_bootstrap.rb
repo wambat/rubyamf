@@ -28,6 +28,7 @@ end
 ActionController::Renderers.add :amf do |amf, options|
   @amf_response = amf
   @mapping_scope = options[:class_mapping_scope] || options[:mapping_scope] || nil
+  @cache_file = options[:cache_file] || nil
   self.content_type ||= Mime::AMF
   self.response_body = " "
 end

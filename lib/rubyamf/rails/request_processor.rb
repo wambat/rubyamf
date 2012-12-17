@@ -61,6 +61,7 @@ module RubyAMF::Rails
 
       # Copy mapping scope over to response so it can be used when serialized
       env['rubyamf.response'].mapping_scope = con.send(:mapping_scope)
+      env['rubyamf.cache_file']=con.send(:cache_file)
 
       return con.send(:amf_response)
     end

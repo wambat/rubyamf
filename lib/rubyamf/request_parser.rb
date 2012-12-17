@@ -46,6 +46,28 @@ module RubyAMF
         return [400, {"Content-Type" => "text/plain", 'Content-Length' => msg.length.to_s}, [msg]]
       end
       env['rubyamf.response'] = RubyAMF::Envelope.new
+      fn=''
+      mid=''
+      req = env['rubyamf.request']
+      rd=req.messages[0].data
+      if(rd.kind_of? RocketAMF::Values::RemotingMessage)
+	ctrl=rd.source
+	mtd=rd.operation
+	mid=rd.messageId
+	fn="./tmp/amf_cache_"+(ctrl.underscore+mtd.underscore).gsub('/','_')
+	ap fn
+      end
+      if(fn!='' && mid!='' && File.exists?(fn))
+	ap 'Cache return: '+fn
+	if(File.mtime(fn)< Time.now-30.minutes)
+	  File.rm(fn)
+	else
+          cnt=File.binread(fn)
+	  cnt.gsub!('MY_LITTLE_PONY_HORSESHOE',mid)
+	  ap "return c"
+	  return [200, {"Content-Type" => RubyAMF::MIME_TYPE, 'Content-Length' => (cnt.length).to_s}, [cnt]]
+	end
+      end
 
       # Pass up the chain to the request processor, or whatever is layered in between
       result = @app.call(env)
@@ -54,6 +76,11 @@ module RubyAMF
       if env['rubyamf.response'].constructed?
         RubyAMF.logger.info "Sending back AMF"
         response = env['rubyamf.response'].to_s
+	unless(env['rubyamf.cache_file'].blank?)
+	  ap 'Caching: '+fn
+	  responseh=response.gsub(mid,'MY_LITTLE_PONY_HORSESHOE')
+          File.binwrite(fn, responseh)
+	end
         return [200, {"Content-Type" => RubyAMF::MIME_TYPE, 'Content-Length' => response.length.to_s}, [response]]
       else
         return result

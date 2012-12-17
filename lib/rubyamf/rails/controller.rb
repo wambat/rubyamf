@@ -12,6 +12,8 @@ module RubyAMF::Rails
     attr_reader :amf_response
     # Used internally by RequestProcessor
     attr_reader :mapping_scope
+    # Used internally by RequestProcessor
+    attr_reader :cache_file
 
     # Returns whether or not the request is an AMF request
     def is_amf?
