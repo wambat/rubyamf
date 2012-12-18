@@ -60,7 +60,7 @@ module RubyAMF
       if(fn!='' && mid!='' && File.exists?(fn))
 	ap 'Cache return: '+fn
 	if(File.mtime(fn)< Time.now-30.minutes)
-	  File.rm(fn)
+	  File.unlink(fn)
 	else
           cnt=File.binread(fn)
 	  cnt.gsub!('MY_LITTLE_PONY_HORSESHOE',mid)
