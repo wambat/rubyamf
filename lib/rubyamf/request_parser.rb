@@ -57,7 +57,7 @@ module RubyAMF
 	fn="./tmp/amf_cache_"+(ctrl.underscore+mtd.underscore).gsub('/','_')
 	ap fn
       end
-      if(fn!='' && mid!='' && File.exists?(fn))
+      if(ENV['RAILS_ENV']=='production' && fn!='' && mid!='' && File.exists?(fn))
 	ap 'Cache return: '+fn
 	if(File.mtime(fn)< Time.now-30.minutes)
 	  File.unlink(fn)
@@ -68,6 +68,7 @@ module RubyAMF
 	  return [200, {"Content-Type" => RubyAMF::MIME_TYPE, 'Content-Length' => (cnt.length).to_s}, [cnt]]
 	end
       end
+      
 
       # Pass up the chain to the request processor, or whatever is layered in between
       result = @app.call(env)
